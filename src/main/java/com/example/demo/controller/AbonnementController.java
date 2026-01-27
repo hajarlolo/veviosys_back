@@ -44,11 +44,16 @@ public class AbonnementController {
     }
 
     @PostMapping
-    public ResponseEntity<Abonnement> createAbonnement(@RequestParam Long clientId,
-            @RequestParam Long offerId,
-            @RequestBody Abonnement abonnementDetails) {
-        Optional<Client> client = clientRepository.findById(clientId);
-        Optional<Offer> offer = offerRepository.findById(offerId);
+    public ResponseEntity<Abonnement> createAbonnement(@RequestBody Abonnement abonnementDetails) {
+        if (abonnementDetails.getClient() == null || abonnementDetails.getClient().getId() == null ||
+            abonnementDetails.getClient().getId() <= 0 ||
+            abonnementDetails.getOffer() == null || abonnementDetails.getOffer().getId() == null ||
+            abonnementDetails.getOffer().getId() <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Optional<Client> client = clientRepository.findById(abonnementDetails.getClient().getId());
+        Optional<Offer> offer = offerRepository.findById(abonnementDetails.getOffer().getId());
 
         if (!client.isPresent() || !offer.isPresent()) {
             return ResponseEntity.badRequest().build();
