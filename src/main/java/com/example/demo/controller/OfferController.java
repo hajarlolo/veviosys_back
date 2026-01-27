@@ -30,7 +30,7 @@ public class OfferController {
     private PropertyRepository propertyRepository;
 
 
-    @GetMapping
+    @GetMapping("/all")
     public List<Offer> getAllOffers() {
         return offerRepository.findAll();
     }

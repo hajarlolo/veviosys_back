@@ -21,6 +21,7 @@ public class ClientController {
     public List<Client> getAllClients() {
         return clientRepository.findAll();
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<Client> getClientById(@PathVariable Long id) {
         Optional<Client> client = clientRepository.findById(id);
@@ -31,7 +32,6 @@ public class ClientController {
         }
     }
 
-   
     @PostMapping
     public Client createClient(@RequestBody Client client) {
         return clientRepository.save(client);
@@ -58,7 +58,6 @@ public class ClientController {
         return ResponseEntity.ok(updatedClient);
     }
 
-   
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
         Optional<Client> client = clientRepository.findById(id);
@@ -68,8 +67,5 @@ public class ClientController {
         clientRepository.delete(client.get());
         return ResponseEntity.noContent().build();
     }
-    @RestController
-public class TestController {
-   
 }
-}
+

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/abonnements")
+@RequestMapping("/api/subscriptions")
 @CrossOrigin(origins = "http://localhost:4200")
 public class AbonnementController {
 
@@ -27,7 +27,7 @@ public class AbonnementController {
     @Autowired
     private OfferRepository offerRepository;
 
-    @GetMapping
+    @GetMapping("/all")
     public List<Abonnement> getAllAbonnements() {
         return abonnementRepository.findAll();
     }

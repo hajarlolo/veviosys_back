@@ -18,7 +18,7 @@ public class TechnologyController {
     private TechnologyRepository technologyRepository;
 
   
-    @GetMapping
+    @GetMapping("/all")
     public List<Technology> getAllTechnologies() {
         return technologyRepository.findAll();
     }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/properties")
+@RequestMapping("/api/proprietes")
 @CrossOrigin(origins = "http://localhost:4200")
 public class PropertyController {
 
@@ -18,7 +18,7 @@ public class PropertyController {
     private PropertyRepository propertyRepository;
 
     
-    @GetMapping
+    @GetMapping("/all")
     public List<Property> getAllProperties() {
         return propertyRepository.findAll();
     }
