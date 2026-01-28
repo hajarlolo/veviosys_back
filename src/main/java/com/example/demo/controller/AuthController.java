@@ -5,13 +5,20 @@ import com.example.demo.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
-
+import org.springframework.http.MediaType;
+import java.nio.file.Path;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -52,9 +59,11 @@ public class AuthController {
 
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
-        return ResponseEntity.ok("Déconnexion réussie");
-    }
+public ResponseEntity<Map<String, String>> logout() {
+    Map<String, String> response = new HashMap<>();
+    response.put("message", "Déconnexion réussie");
+    return ResponseEntity.ok(response);
+}
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) {
@@ -139,29 +148,63 @@ public class AuthController {
         mailSender.send(message); // envoi de l'email
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        Optional<User> userOpt = userRepository.findById(id);
-        if (!userOpt.isPresent()) {
-            return ResponseEntity.notFound().build();
+   @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ResponseEntity<User> updateUser(
+        @PathVariable Long id,
+        @RequestParam(required = false) MultipartFile photo,
+        @RequestParam(required = false) String nom,
+        @RequestParam(required = false) String prenom,
+        @RequestParam(required = false) String email,
+        @RequestParam(required = false) String password,
+        @RequestParam(required = false) String adresse,
+        @RequestParam(required = false) String telephone,
+        @RequestParam(required = false) String ville,
+        @RequestParam(required = false) String pays,
+        @RequestParam(required = false) String cin
+) {
+
+    Optional<User> userOpt = userRepository.findById(id);
+    if (!userOpt.isPresent()) {
+        return ResponseEntity.notFound().build();
+    }
+
+    User user = userOpt.get();
+
+    // Update text fields
+    if (nom != null) user.setNom(nom);
+    if (prenom != null) user.setPrenom(prenom);
+    if (email != null) user.setEmail(email);
+    if (password != null && !password.isEmpty()) user.setPassword(password);
+    if (adresse != null) user.setAdresse(adresse);
+    if (telephone != null) user.setTelephone(telephone);
+    if (ville != null) user.setVille(ville);
+    if (pays != null) user.setPays(pays);
+    if (cin != null) user.setCin(cin);
+
+    // 📸 Handle Photo Upload
+    if (photo != null && !photo.isEmpty()) {
+    try {
+        String fileName = System.currentTimeMillis() + "_" + photo.getOriginalFilename().replaceAll(" ", "_");
+        Path uploadPath = Paths.get("uploads/users");
+
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
         }
 
-        User user = userOpt.get();
-        // Met à jour les champs (tu peux adapter selon ce que tu veux permettre de
-        // modifier)
-        user.setNom(updatedUser.getNom());
-        user.setPrenom(updatedUser.getPrenom());
-        user.setEmail(updatedUser.getEmail());
-        user.setPassword(updatedUser.getPassword());
-        user.setProfil(updatedUser.getProfil()); // Ajoutez cette ligne pour l'image
-        user.setAdresse(updatedUser.getAdresse());
-        user.setTelephone(updatedUser.getTelephone());
-        user.setVille(updatedUser.getVille());
-        user.setPays(updatedUser.getPays());
-        user.setActive(updatedUser.getActive());
-        user.setCin(updatedUser.getCin());
-        userRepository.save(user);
-        return ResponseEntity.ok(user);
+        Path filePath = uploadPath.resolve(fileName);
+        Files.copy(photo.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        // ⚡ Stocke juste le nom, pas le chemin complet
+        user.setProfil(fileName);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(500).build();
     }
+}
+
+    userRepository.save(user);
+    return ResponseEntity.ok(user);
+}
     
 }
