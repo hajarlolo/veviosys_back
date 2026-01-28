@@ -36,6 +36,7 @@ public class Abonnement {
 
     private Boolean active = true;
 
+    private int nbuser ;
     
     public Abonnement() {}
 
@@ -98,5 +99,11 @@ public class Abonnement {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+    public int getNbuser() {
+        return nbuser;
+    }   
+    public void setNbuser(int nbuser) {
+        this.nbuser = nbuser;
     }
 }

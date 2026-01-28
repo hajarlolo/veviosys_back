@@ -6,6 +6,7 @@ import com.example.demo.entity.Offer;
 import com.example.demo.Repository.AbonnementRepository;
 import com.example.demo.Repository.ClientRepository;
 import com.example.demo.Repository.OfferRepository;
+import com.example.demo.service.AbonnementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,19 +28,26 @@ public class AbonnementController {
     @Autowired
     private OfferRepository offerRepository;
 
+    @Autowired
+    private AbonnementService abonnementService; // 🔥 Injection du service
+
+    // ✅ Avant de retourner tous les abonnements, vérifier et désactiver les expirés
     @GetMapping("/all")
     public List<Abonnement> getAllAbonnements() {
+        abonnementService.checkAndDisableExpired(); // Appel du service
         return abonnementRepository.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Abonnement> getAbonnementById(@PathVariable Long id) {
+        abonnementService.checkAndDisableExpired(); // 🔥 Appel du service avant lecture
         Optional<Abonnement> abonnement = abonnementRepository.findById(id);
         return abonnement.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/count")
     public int getAbonnementsCount() {
+        abonnementService.checkAndDisableExpired(); // 🔥 Toujours vérifier
         return abonnementRepository.findAll().size();
     }
 
@@ -67,6 +75,7 @@ public class AbonnementController {
         abonnement.setConfirme(abonnementDetails.getConfirme());
         abonnement.setTotal(abonnementDetails.getTotal());
         abonnement.setActive(abonnementDetails.getActive());
+        abonnement.setNbuser(abonnementDetails.getNbuser());
 
         Abonnement savedAbonnement = abonnementRepository.save(abonnement);
         return ResponseEntity.ok(savedAbonnement);
@@ -74,7 +83,7 @@ public class AbonnementController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Abonnement> updateAbonnement(@PathVariable Long id,
-            @RequestBody Abonnement abonnementDetails) {
+                                                       @RequestBody Abonnement abonnementDetails) {
         Optional<Abonnement> optionalAbonnement = abonnementRepository.findById(id);
         if (!optionalAbonnement.isPresent()) {
             return ResponseEntity.notFound().build();
@@ -86,6 +95,7 @@ public class AbonnementController {
         abonnement.setConfirme(abonnementDetails.getConfirme());
         abonnement.setTotal(abonnementDetails.getTotal());
         abonnement.setActive(abonnementDetails.getActive());
+        abonnement.setNbuser(abonnementDetails.getNbuser());
 
         Abonnement updatedAbonnement = abonnementRepository.save(abonnement);
         return ResponseEntity.ok(updatedAbonnement);
@@ -99,5 +109,12 @@ public class AbonnementController {
         }
         abonnementRepository.delete(abonnement.get());
         return ResponseEntity.noContent().build();
+    }
+
+    // 🔹 Nouveau endpoint pour forcer la vérification / désactivation des abonnements expirés
+    @PostMapping("/check-expired")
+    public ResponseEntity<String> checkExpiredAbonnements() {
+        abonnementService.checkAndDisableExpired();
+        return ResponseEntity.ok("Abonnements expirés mis à jour");
     }
 }

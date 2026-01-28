@@ -40,15 +40,7 @@ public class Offer {
     @JsonIgnoreProperties("offers") // évite boucle JSON
     private Set<Technology> technologies;
 
-   
-    @ManyToMany
-    @JoinTable(
-        name = "offer_properties",
-        joinColumns = @JoinColumn(name = "offer_id"),
-        inverseJoinColumns = @JoinColumn(name = "property_id")
-    )
     @JsonIgnoreProperties("offers") 
-    private Set<Property> properties;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -108,14 +100,6 @@ public class Offer {
 
     public void setTechnologies(Set<Technology> technologies) {
         this.technologies = technologies;
-    }
-
-    public Set<Property> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(Set<Property> properties) {
-        this.properties = properties;
     }
 
     public Timestamp getCreatedAt() {

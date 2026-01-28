@@ -43,6 +43,7 @@ public class User {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Timestamp createdAt;
+    private String cin;
 
     public User() {
     }
@@ -134,9 +135,27 @@ public class User {
     public Timestamp getCreatedAt() {
         return createdAt;
     }
-    public String getResetToken() { return resetToken; }
-public void setResetToken(String resetToken) { this.resetToken = resetToken; }
 
-public LocalDateTime getTokenExpiryDate() { return tokenExpiryDate; }
-public void setTokenExpiryDate(LocalDateTime tokenExpiryDate) { this.tokenExpiryDate = tokenExpiryDate; }
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public LocalDateTime getTokenExpiryDate() {
+        return tokenExpiryDate;
+    }
+
+    public void setTokenExpiryDate(LocalDateTime tokenExpiryDate) {
+        this.tokenExpiryDate = tokenExpiryDate;
+    }
+    public String getCin() {
+        return cin;
+    }
+
+    public void setCin(String cin) {
+        this.cin = cin;
+    }
 }

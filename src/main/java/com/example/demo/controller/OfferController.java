@@ -1,10 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Offer;
-import com.example.demo.entity.Property;
 import com.example.demo.entity.Technology;
 import com.example.demo.Repository.OfferRepository;
-import com.example.demo.Repository.PropertyRepository;
 import com.example.demo.Repository.TechnologyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +23,6 @@ public class OfferController {
 
     @Autowired
     private TechnologyRepository technologyRepository;
-
-    @Autowired
-    private PropertyRepository propertyRepository;
-
 
     @GetMapping("/all")
     public List<Offer> getAllOffers() {
@@ -56,15 +50,7 @@ public class OfferController {
             }
         }
 
-        Set<Property> validProperties = new HashSet<>();
-        if (offer.getProperties() != null) {
-            for (Property prop : offer.getProperties()) {
-                propertyRepository.findById(prop.getId()).ifPresent(validProperties::add);
-            }
-        }
-
         offer.setTechnologies(validTechnologies);
-        offer.setProperties(validProperties);
 
         Offer savedOffer = offerRepository.save(offer);
         return ResponseEntity.ok(savedOffer);
@@ -93,15 +79,6 @@ public class OfferController {
             }
         }
         offer.setTechnologies(validTechnologies);
-
-        
-        Set<Property> validProperties = new HashSet<>();
-        if (offerDetails.getProperties() != null) {
-            for (Property prop : offerDetails.getProperties()) {
-                propertyRepository.findById(prop.getId()).ifPresent(validProperties::add);
-            }
-        }
-        offer.setProperties(validProperties);
 
         Offer updatedOffer = offerRepository.save(offer);
         return ResponseEntity.ok(updatedOffer);
